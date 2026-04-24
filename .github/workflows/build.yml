@@ -3,6 +3,7 @@ name: Build ERPNext Image
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -11,10 +12,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # This step reads the file and saves the base64 string to a variable
+      - name: Encode apps.json to Base64
+        id: encode_json
+        run: |
+          ENCODED=$(base64 -w 0 apps.json)
+          echo "apps_base64=$ENCODED" >> $GITHUB_OUTPUT
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
         with:
-          # This 'driver-opts' line fixes the DNS issues in some environments
           driver-opts: network=host
 
       - name: Login to Docker Hub
@@ -29,9 +36,8 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/erpnext-custom:latest
-          # This converts your apps.json into the base64 string Frappe's Dockerfile needs
+          # We pull the value from the 'encode_json' step above
           build-args: |
-            APPS_JSON_BASE64=${{ base64_encode(file.read('apps.json')) }}
-          # Fixes the 'failed to solve' cache errors
+            APPS_JSON_BASE64=${{ steps.encode_json.outputs.apps_base64 }}
           cache-from: type=gha
           cache-to: type=gha,mode=max

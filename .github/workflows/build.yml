@@ -5,6 +5,10 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+env:
+  # This removes the warning by opting into the newer Node.js 24 runtime
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -12,10 +16,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # This step reads the file and saves the base64 string to a variable
       - name: Encode apps.json to Base64
         id: encode_json
         run: |
+          if [ ! -f "apps.json" ]; then
+            echo "❌ apps.json not found!"
+            exit 1
+          fi
           ENCODED=$(base64 -w 0 apps.json)
           echo "apps_base64=$ENCODED" >> $GITHUB_OUTPUT
 
@@ -36,7 +43,6 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/erpnext-custom:latest
-          # We pull the value from the 'encode_json' step above
           build-args: |
             APPS_JSON_BASE64=${{ steps.encode_json.outputs.apps_base64 }}
           cache-from: type=gha

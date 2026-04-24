@@ -1,22 +1,27 @@
 [
   {
     "app_name": "frappe",
-    "repo_url": "https://github.com/frappe/frappe",
+    "url": "https://github.com/frappe/frappe",
     "branch": "v15.51.1"
   },
   {
     "app_name": "erpnext",
-    "repo_url": "https://github.com/frappe/erpnext",
+    "url": "https://github.com/frappe/erpnext",
     "branch": "v15.47.4"
   },
   {
+    "app_name": "payments",
+    "url": "https://github.com",
+    "branch": "version-15"
+  },
+  {
     "app_name": "hrms",
-    "repo_url": "https://github.com/frappe/hrms",
+    "url": "https://github.com/frappe/hrms",
     "branch": "v15.37.2"
   },
   {
     "app_name": "lending",
-    "repo_url": "https://github.com/frappe/lending",
+    "url": "https://github.com/frappe/lending",
     "branch": "develop"
   }
 ]

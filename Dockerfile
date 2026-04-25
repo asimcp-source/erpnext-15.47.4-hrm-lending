@@ -2,7 +2,7 @@ FROM frappe/build:version-15
 
 ARG APPS_JSON_BASE64
 
-# 1. Initialize the bench with ONLY Frappe first
+# Initialize bench
 RUN bench init /home/frappe/frappe-bench \
     --frappe-branch version-15 \
     --no-procfile \
@@ -10,11 +10,11 @@ RUN bench init /home/frappe/frappe-bench \
     --skip-redis-config-generation \
     --skip-assets
 
-# 2. Decode apps.json and install apps one by one
 WORKDIR /home/frappe/frappe-bench
+
+# Use a more robust script to install apps
 RUN if [ -n "${APPS_JSON_BASE64}" ]; then \
         echo "${APPS_JSON_BASE64}" | base64 -d > apps.json; \
-        ./env/bin/python -m pip install --upgrade pip; \
-        # This command tells bench to install the apps from the file
-        bench get-app --from-json apps.json; \
+        # Install apps one by one using a python helper to avoid shell issues
+        python3 -c "import json; [print(f'bench get-app {a[\"url\"]} --branch {a[\"branch\"]}') for a in json.load(open('apps.json'))]" | bash; \
     fi

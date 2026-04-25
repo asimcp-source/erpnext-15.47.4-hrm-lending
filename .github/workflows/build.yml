@@ -3,6 +3,7 @@ name: Build ERPNext Image
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -11,9 +12,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Encode apps.json
+      # Converts your apps.json into the Base64 format Frappe needs
+      - name: Encode apps.json to Base64
         id: encode_json
         run: |
+          if [ ! -f "apps.json" ]; then
+            echo "❌ apps.json not found in root!"
+            exit 1
+          fi
           ENCODED=$(base64 -w 0 apps.json)
           echo "apps_base64=$ENCODED" >> $GITHUB_OUTPUT
 
@@ -30,7 +36,14 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./Dockerfile
           push: true
+          # Force pull fresh metadata to fix "not found" errors
+          pull: true
+          # provenance: false prevents common metadata/attestation errors
+          provenance: false
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/erpnext-custom:latest
           build-args: |
             APPS_JSON_BASE64=${{ steps.encode_json.outputs.apps_base64 }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

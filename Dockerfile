@@ -12,9 +12,9 @@ RUN bench init /home/frappe/frappe-bench \
 
 WORKDIR /home/frappe/frappe-bench
 
-# Use a more robust script to install apps
+# Install apps with resolution flags
 RUN if [ -n "${APPS_JSON_BASE64}" ]; then \
         echo "${APPS_JSON_BASE64}" | base64 -d > apps.json; \
-        # Install apps one by one using a python helper to avoid shell issues
-        python3 -c "import json; [print(f'bench get-app {a[\"url\"]} --branch {a[\"branch\"]}') for a in json.load(open('apps.json'))]" | bash; \
+        # We add --resolve-deps to fix version conflicts between ERPNext and HRMS
+        python3 -c "import json; [print(f'bench get-app {a[\"url\"]} --branch {a[\"branch\"]} --resolve-deps') for a in json.load(open('apps.json'))]" | bash; \
     fi

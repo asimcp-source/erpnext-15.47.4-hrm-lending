@@ -1,8 +1,8 @@
 [
   {
     "app_name": "erpnext",
-    "url": "https://github.com/frappe/erpnext",
-    "branch": "v15.47.4"
+    "url": "https://github.com",
+    "branch": "version-15"
   },
   {
     "app_name": "payments",
@@ -11,12 +11,12 @@
   },
   {
     "app_name": "hrms",
-    "url": "https://github.com/frappe/hrms",
-    "branch": "v15.37.2"
+    "url": "https://github.com",
+    "branch": "version-15"
   },
   {
     "app_name": "lending",
     "url": "https://github.com",
-    "branch": "develop"
+    "branch": "version-15"
   }
 ]

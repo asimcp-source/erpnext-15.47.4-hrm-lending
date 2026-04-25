@@ -1,17 +1,17 @@
-# Use the build-specific image
 FROM frappe/build:version-15
 
 ARG APPS_JSON_BASE64
 
-RUN export APP_INSTALL_ARGS="" && \
-    if [ -n "${APPS_JSON_BASE64}" ]; then \
-        export APP_INSTALL_ARGS="--apps_path=/opt/frappe/apps.json"; \
-        echo "${APPS_JSON_BASE64}" | base64 -d > /opt/frappe/apps.json; \
-    fi && \
-    bench init ${APP_INSTALL_ARGS} \
-    --frappe-branch=version-15 \
+# Use /tmp for temporary files to avoid permission issues in /opt
+RUN if [ -n "${APPS_JSON_BASE64}" ]; then \
+        echo "${APPS_JSON_BASE64}" | base64 -d > /tmp/apps.json; \
+    fi
+
+# Create bench as the frappe user in their home directory
+RUN bench init /home/frappe/frappe-bench \
+    --frappe-branch version-15 \
+    --apps_path /tmp/apps.json \
     --no-procfile \
     --no-backups \
     --skip-redis-config-generation \
-    --verbose \
-    /home/frappe/frappe-bench
+    --verbose

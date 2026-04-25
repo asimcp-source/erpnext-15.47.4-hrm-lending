@@ -1,6 +1,6 @@
 # Use the official Frappe worker image for version 15
 #FROM frappe/frappe-worker:v15
-FROM frappe/frappe-worker:version-
+FROM frappe/frappe-worker:version-15
 
 # This argument will be passed from your GitHub Action
 ARG APPS_JSON_BASE64
